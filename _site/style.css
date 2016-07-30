@@ -317,6 +317,23 @@ footer {
   text-align: center;
 }
 
+html, body {
+  height: 100%;
+}
+
+.added-wrapper {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -85px;
+  /* the bottom margin is the negative value of the footer's height */
+}
+
+.wrapper-footer, .push {
+  height: 85px;
+  /* .push must be the same height as .footer */
+}
+
 .highlight {
   background-color: #efefef;
   padding: 7px 7px 7px 10px;
