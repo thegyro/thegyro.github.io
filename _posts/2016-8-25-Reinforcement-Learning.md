@@ -347,4 +347,42 @@ After $1000$ episodes this is the result,
 
 With a discount factor of $0.9$ the maximum reward an agent can get from the top left state is $0.9^3 = 0.73$, our agent has learnt $0.66$, which is pretty close. For some states the action value has converged to $Q_{\*}$ and for others it has not exactly converged, but comes close (we are keeping a fixed $\epsilon$ and $\alpha$, so we don't exactly have the mathematical guarantees).
 
+There can be other environments where if agent arrived at an intermediate policy which causes it to be struck at a certain state, then MC methods will never learn anything, because they wait for the end of the episode to know what return you get. But methods like SARSA which learn from a step-by-step basis figure out that the curernt policy is shit and will learn another policy.
+
 **Off Policy TD Control: Q-Learning**
+
+In off policy learning we evaluate target policy $\pi(s\mid a)$ while following behavior policy $\mu(a \mid s)$. This is useful when you want your agent to learn by observing other agents. It can also be useful when an agent is learning from its experience generated from old policies. In Q-Learning, the target policy $\pi$ is greedy with respect to $Q(s,a)$, $\pi(S_{t+1}) = \arg\max_a Q(S_{t+1},a)$. So the algorithm is same as SARSA except for the update rule and what *next* action you take. The update rule is,
+
+$$ Q(S_{t},A_{t}) \leftarrow Q(S_{t}, A_{t}) + \alpha [(R_{t+1} + \gamma \max_a Q(S_{t+1}, a)) - Q(S_{t}, A_{t})] $$
+
+In Q-Learning, the update is made towards the optimal Q-Value, but the next action is chosen from $\epsilon$-greedy. In SARSA, the update is made towards Q-Value of an actual action chosen from $\epsilon$-greedy. That is the key difference. The control policy towards which the update is made is the same policy by which the agent is moving but in Q-Learning the update is made towards the greedy policy irrespective of what policy is being actually followed by the agent. This is why SARSA is on-policy but Q-Learning is off.
+
+Difference between Q-Learning and SARSA is beautifully illustrated by the Cliff example from Sutton's book. I found this [blog post](https://studywolf.wordpress.com/2013/07/01/reinforcement-learning-sarsa-vs-q-learning/) to recreate that experiment quite useful to understand the difference.
+
+I will also illustrate the difference with the DiscountGrid environment from Berkeley. It is quite similar to the cliff example from Sutton's book. This is the environment
+
+<p align='center'>
+<img src="/images/rl-1/cliff_example.png">
+</p>
+
+Suppose there are no intermediate rewards and no noise in the environment, the optimal policy is to walk right (red line) towards the $+10$ reward. The roundabout way of reaching $+10$ will be heavily discounted. Let's see what policies SARSA and Q-Learning agent learn after $10000$ episodes ($\alpha=0.2, \epsilon=0.3, \gamma=0.9$).
+
+Policy learnt by SARSA
+
+<p align='center'>
+<img src="/images/rl-1/cliff_sarsa.png">
+</p>
+
+That is after $10000$ episodes if you follow the policy $\pi(s) = \arg\max_a Q(s,a)$ you ssee that SARSA learns the safe roundabout policy. It does this because it follows the $\epsilon$-greedy policy, and it observes that the agent falls into the cliff occassionally which gives it a BIG $-10$ reward. The agent does not like it and realizes that for such a policy with signifcant random component involved, it is better to take the safe roundabout route.
+
+Now look at the policy learnt by Q-Learning
+
+<p align='center'>
+<img src="/images/rl-1/cliff_qlearn.png">
+</p>
+
+You can see that Q-Learning has learnt the optimal policy. So if you tune $\epsilon$ to zero after the experiment, Q-Learning gives the most reward. Q-Learning is updating its Q-Value towards the greedy policy so is not influenced by the random component invovled in pushing it down the cliff. However since Q-Learning takes the risky route but is actually following the $\epsilon$-greedy policy, it falls into the cliff occassionally thereby giving it a lesser average reward than SARSA.
+
+**Next Post: Linear Function Approximators**
+
+In all the algorithms we have discussed so far we have represented the value function and action function as lookup tables. This is useless for problems with continuous or infinite state or action spaces, which is what the real world is! So no more tables to tackle problems which matter. We will see how we can learn optimal policies by representing the state and action spaces with a function approximators.
