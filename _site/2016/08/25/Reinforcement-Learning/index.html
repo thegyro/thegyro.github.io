@@ -335,7 +335,7 @@ average it. That’s what $V(s)$ is.</li>
 
 <p>It does if we follow a <strong>GLIE</strong> (Greedy in the Limit with Infinite Exploration) sequence of policies and we have step-sizes following a Robbins-Monro sequence.</p>
 
-<p>We definie a sequnece of policies $\pi_k$ as GLIE if</p>
+<p>We definie a sequnece of policies $\pi_t$ as GLIE if</p>
 
 <ul>
   <li>All state-action pairs are visited infinitely many times
@@ -357,13 +357,13 @@ average it. That’s what $V(s)$ is.</li>
   <li>$\sum_{t=1}^{\infty} \alpha_t^2  &lt; \infty$</li>
 </ul>
 
-<p>Qualitatively it means that if we want our step-sizes to be sufficiently large so that we can move our action values as much as you want, but changes to your value keeps getting smaller and smaller.</p>
+<p>Qualitatively it means that we want our step-sizes to be sufficiently large so that we can move our action values as much as we want, but changes to the value keeps getting smaller and smaller.</p>
 
-<p>Enough theory, let’s get to code!</p>
+<p>Enough theory, let’s get some code running!</p>
 
-<p>I am going to take <a href="http://ai.berkeley.edu/project_overview.html">Berkeley’s AI Projects</a> to demonstrate a gridworld example with SARSA. They have prvoided a nice gridworld environment for which we can write our own agents. You can find my entire integrated implementation on my <a href="https://github.com/thegyro/rl-demos/tree/master/tabular/gridworld">github</a></p>
+<p>I am going to take <a href="http://ai.berkeley.edu/project_overview.html">Berkeley’s AI Projects</a> to demonstrate a gridworld example with SARSA. They have prvoided a nice gridworld environment for which we can write our own agents. You can find my entire integrated implementation on my <a href="https://github.com/thegyro/rl-demos/tree/master/tabular/gridworld">github</a>.</p>
 
-<p>We can implement it in the following way.</p>
+<p>We can implement it in the following way,</p>
 
 <div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SarsaLearningAgent</span><span class="p">:</span>
 	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
@@ -419,7 +419,7 @@ average it. That’s what $V(s)$ is.</li>
 		<span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="n">state</span><span class="p">,</span><span class="n">action</span><span class="p">]</span> <span class="o">=</span> <span class="n">currQ</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="n">target</span> <span class="o">-</span> <span class="n">currQ</span><span class="p">)</span>
 </code></pre>
 </div>
-<p>Here the <code class="highlighter-rouge">update()</code> function is called by the environment after every time step.</p>
+<p>Here the <em><code class="highlighter-rouge">update()</code></em> function is called by the environment after every time step.</p>
 
 <p>A sample gif of an agent learning the action values through SARSA ($\alpha=0.2, \gamma=0.9, \epsilon=0.3$):</p>
 

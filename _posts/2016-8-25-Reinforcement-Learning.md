@@ -246,7 +246,7 @@ Does SARSA converge towards $Q_{\*}$?
 
 It does if we follow a **GLIE** (Greedy in the Limit with Infinite Exploration) sequence of policies and we have step-sizes following a Robbins-Monro sequence.
 
-We definie a sequnece of policies $\pi_k$ as GLIE if
+We definie a sequnece of policies $\pi_t$ as GLIE if
 
 * All state-action pairs are visited infinitely many times
   * $\lim_{t \rightarrow \infty} N_t(s,a) = \infty$
@@ -258,13 +258,13 @@ We have Robbins-Monro sequence of step-sizes $\alpha_t$ if
 * $\sum_{t=1}^{\infty} \alpha_t = \infty$
 * $\sum_{t=1}^{\infty} \alpha_t^2  < \infty$
 
-Qualitatively it means that if we want our step-sizes to be sufficiently large so that we can move our action values as much as you want, but changes to your value keeps getting smaller and smaller.
+Qualitatively it means that we want our step-sizes to be sufficiently large so that we can move our action values as much as we want, but changes to the value keeps getting smaller and smaller.
 
-Enough theory, let's get to code!
+Enough theory, let's get some code running!
 
-I am going to take [Berkeley's AI Projects](http://ai.berkeley.edu/project_overview.html) to demonstrate a gridworld example with SARSA. They have prvoided a nice gridworld environment for which we can write our own agents. You can find my entire integrated implementation on my [github](https://github.com/thegyro/rl-demos/tree/master/tabular/gridworld)
+I am going to take [Berkeley's AI Projects](http://ai.berkeley.edu/project_overview.html) to demonstrate a gridworld example with SARSA. They have prvoided a nice gridworld environment for which we can write our own agents. You can find my entire integrated implementation on my [github](https://github.com/thegyro/rl-demos/tree/master/tabular/gridworld).
 
-We can implement it in the following way.
+We can implement it in the following way,
 
 ```python
 class SarsaLearningAgent:
@@ -320,7 +320,7 @@ class SarsaLearningAgent:
 		currQ = self.Q[state, action]
 		self.Q[state,action] = currQ + self.alpha*(target - currQ)
 ```
-Here the `update()` function is called by the environment after every time step.
+Here the *`update()`* function is called by the environment after every time step.
 
 A sample gif of an agent learning the action values through SARSA ($\alpha=0.2, \gamma=0.9, \epsilon=0.3$):
 
