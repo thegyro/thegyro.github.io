@@ -18,9 +18,11 @@ html {
 }
 
 body {
-	background: $white;
-  font: 18px/1.4 $helvetica;
-  color: $darkGray;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 300;
+  background-color: #fdfdfd
 }
 
 .container {
@@ -33,11 +35,9 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: $helveticaNeue;
   color: $darkerGray;
-  font-weight: bold;
-
-  line-height: 1.7;
-  margin: 1em 0 15px;
-  padding: 0;
+  letter-spacing: -1.75px;
+  line-height: 1;
+  font-weight: 300;
 
   @include mobile {
     line-height: 1.4;
@@ -151,11 +151,11 @@ img {
 //
 
 .wrapper-masthead {
-  margin-bottom: 50px;
+  margin-bottom: 25px;
 }
 
 .masthead {
-  padding: 20px 0;
+  padding: 10px 0;
   border-bottom: 1px solid $lightGray;
 
   @include mobile {
@@ -272,6 +272,21 @@ nav {
 }
 
 
+.post-header { margin: 10px 0 30px; }
+
+.post-header h1 {
+  font-size: 30px;
+  letter-spacing: -1.75px;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.post-header .meta {
+  font-size: 15px;
+  color: #818181;
+  margin-top: 5px;
+
+}
 .wrapper-footer {
   margin-top: 50px;
   border-top: 1px solid #ddd;
@@ -286,6 +301,7 @@ footer {
 
 html, body {
     height: 100%;
+    font-family: Helvetica, Arial, sans-serif;
 }
 .added-wrapper {
     min-height: 100%;
@@ -299,5 +315,6 @@ html, body {
 
 // Settled on moving the import of syntax highlighting to the bottom of the CSS
 // ... Otherwise it really bloats up the top of the CSS file and makes it difficult to find the start
-@import "highlights";
+//@import "highlights";
 @import "svg-icons";
+@import "monokai"
