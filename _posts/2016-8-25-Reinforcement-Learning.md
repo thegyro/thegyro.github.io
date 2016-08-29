@@ -232,7 +232,7 @@ The name SARSA (State, Action, Reward, State, Action) is because from a current 
 
 For control, we do the following,
 
-* Initialize $Q(S,A) ~ \forall S,$. For terminal states $Q(S, .) = 0$.
+* Initialize $Q(S,A) ~ \forall S$. For terminal states $Q(S, .) = 0$.
 * Repeat (for each episode)
   * Initialize start state $S$
   * Choose $A$ from $S$ using policy dervied from $Q$ (example, $\epsilon$-greedy)
