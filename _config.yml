@@ -6,7 +6,7 @@
 name: Computational Rationality
 
 # Short bio or description (displayed in the header)
-description: 'Blog about my work in AI, DL, RL, and NLP'
+description: 'Blog about my work in AI'
 
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
 avatar: https://avatars2.githubusercontent.com/u/4838833?v=3&s=460
@@ -49,21 +49,20 @@ url: https://thegyro.github.io
 # then add in the baseurl here, like this: "/repository-name"
 baseurl: ""
 
-#
-# !! You don't need to change any of the configuration flags below !!
-#
-
-markdown: kramdown
-highlighter: rouge
-permalink: pretty
-
-kramdown:
-  input: GFM
-  auto_ids: true
-  syntax_highlighter: rouge
+permalink: /:title/
 
 # The release of Jekyll Now that you're using
-version: v1.1.0
+version: v1.2.0
+
+# Jekyll 3 now only supports Kramdown for Markdown
+kramdown:
+  # Use GitHub flavored markdown, including triple backtick fenced code blocks
+  input: GFM
+  # Jekyll 3 and GitHub Pages now only support rouge for syntax highlighting
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    # Use existing pygments syntax highlighting css
+    css_class: 'highlight'
 
 # Set the Sass partials directory, as we're using @imports
 sass:
@@ -76,8 +75,8 @@ gems:
 
 # Exclude these files from your production _site
 exclude:
-    - Gemfile
-    - Gemfile.lock
-    - LICENSE
-    - README.md
-    - CNAME
+  - Gemfile
+  - Gemfile.lock
+  - LICENSE
+  - README.md
+  - CNAME

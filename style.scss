@@ -25,23 +25,14 @@ body {
   background-color: #fdfdfd
 }
 
+h1, h2, h3, h4, h5, h6 { font-size: 100%; font-weight: 400; }
+
+
 .container {
   margin: 0 auto;
   max-width: 740px;
   padding: 0 10px;
   width: 100%;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: $helveticaNeue;
-  color: $darkerGray;
-  letter-spacing: -1.75px;
-  line-height: 1;
-  font-weight: 300;
-
-  @include mobile {
-    line-height: 1.4;
-  }
 }
 
 h1 {
