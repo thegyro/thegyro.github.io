@@ -88,6 +88,7 @@ ENV/
 # Rope project settings
 .ropeproject
 
-.sass-cache/
+.*
+!/.gitignore
 Gemfile
 Gemfile.lock
