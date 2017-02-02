@@ -294,7 +294,7 @@ nav a {
   margin-top: 10px;
 }
 .post .read-more {
-  text-transform: uppercase;
+  /*text-transform: uppercase; */
   font-size: 15px;
 }
 
@@ -316,14 +316,14 @@ nav a {
 }
 
 .wrapper-footer {
-  margin-top: 50px;
+  margin-top: 20px;
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
   background-color: #eee;
 }
 
 footer {
-  padding: 20px 0;
+  padding: 20px 0px 0px 0px;
   text-align: center;
 }
 

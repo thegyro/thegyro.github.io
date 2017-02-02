@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="http://localhost:4000/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.3.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-01-24T16:32:04+05:30</updated><id>http://localhost:4000//</id><title type="html">Computational Rationality</title><subtitle>Blog about my work in AI</subtitle><entry><title type="html">Reinforcement Learning - What’s the deal?</title><link href="http://localhost:4000/Reinforcement-Learning/" rel="alternate" type="text/html" title="Reinforcement Learning - What's the deal?" /><published>2016-08-25T00:00:00+05:30</published><updated>2016-08-25T00:00:00+05:30</updated><id>http://localhost:4000/Reinforcement-Learning</id><content type="html" xml:base="http://localhost:4000/Reinforcement-Learning/">&lt;p&gt;I have been studying RL for some time now. It is a very hot field which gained a lot of attention after DeepMind’s agent learned to play ATARI games remarkably well and their AlphaGo bot defeating the Go champion, being the first computer to do so. I have been working through &lt;a href=&quot;http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html&quot;&gt;David Silver’s RL lectures&lt;/a&gt;, referencing &lt;a href=&quot;https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html&quot;&gt;Richard Sutton’s book&lt;/a&gt;, and &lt;a href=&quot;https://www.youtube.com/watch?v=aUrX-rP_ss4&quot;&gt;John Schulman’s lectures&lt;/a&gt;. I understand things completely only when I write them down and get some Python code running. I want to give a brief intro to RL and dive into writing RL agents with Python. This should be of some help to anyone with no formal background in the area but want to quickly get a mathematical feel about it and start writing agents.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="http://localhost:4000/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.3.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-02-02T12:38:57+05:30</updated><id>http://localhost:4000//</id><title type="html">Computational Rationality</title><subtitle>Blog about my work in AI</subtitle><entry><title type="html">Reinforcement Learning - What’s the deal?</title><link href="http://localhost:4000/Reinforcement-Learning/" rel="alternate" type="text/html" title="Reinforcement Learning - What's the deal?" /><published>2016-08-25T00:00:00+05:30</published><updated>2016-08-25T00:00:00+05:30</updated><id>http://localhost:4000/Reinforcement-Learning</id><content type="html" xml:base="http://localhost:4000/Reinforcement-Learning/">&lt;p&gt;I have been studying RL for some time now. It is a very hot field which gained a lot of attention after DeepMind’s agent learned to play ATARI games remarkably well and their AlphaGo bot defeating the Go champion, being the first computer to do so. I have been working through &lt;a href=&quot;http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html&quot;&gt;David Silver’s RL lectures&lt;/a&gt;, referencing &lt;a href=&quot;https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html&quot;&gt;Richard Sutton’s book&lt;/a&gt;, and &lt;a href=&quot;https://www.youtube.com/watch?v=aUrX-rP_ss4&quot;&gt;John Schulman’s lectures&lt;/a&gt;. I understand things completely only when I write them down and get some Python code running. I want to give a brief intro to RL and dive into writing RL agents with Python. This should be of some help to anyone with no formal background in the area but want to quickly get a mathematical feel about it and start writing agents.&lt;/p&gt;
 
 &lt;p&gt;In this post I will talk about&lt;/p&gt;
 
@@ -15,7 +15,9 @@
 
 &lt;h2 id=&quot;building-blocks&quot;&gt;Building Blocks&lt;/h2&gt;
 
-&lt;p&gt;RL revolves around an agent (which we control) interacting with the environment (outside our control). An agent from a given state takes an action on the environment, and the environment transitions the agent into a new state and gives a reward. Our fundamental objective is to build an agent which executes actions so as to get as much reward as possible.  MDP helps us in providing a mathematical formulation for this objective.  An MDP is a tuple $&amp;lt; S, A, P, R&amp;gt;$ where $S$ denotes the state space for the agent, $A$ the action space, $P$ the probability distribution of a transition, and $R$ the corresponding reward distribution. A transition is a sample $(s, a, s’, r)$ observed when an agent from state $s$ takes an action $a$ on the environment and lands in state $s’$ with a reward $r$. Underlying assumption of MDP is the Markov process. Basically, what the Markov assumption is that the future depends on the present independent of the past. Mathematically,&lt;/p&gt;
+&lt;p&gt;Reinforcement Learning (RL) revolves around an agent, which we control, interacting with the environment which is outside of our control. An agent from a given state takes an action on the environment which in turn transitions the agent into a new state and gives a reward.&lt;/p&gt;
+
+&lt;p&gt;Our fundamental objective is to build an agent which executes actions so as to get as much reward as possible from the environment. &lt;strong&gt;Markov Decision Process&lt;/strong&gt; helps us in providing a mathematical formulation for this objective.  An MDP is a tuple $\langle S, A, P, R \rangle$ where $S$ denotes the state space for the agent, $A$ the action space, $P$ the probability distribution of a transition, and $R$ the corresponding reward distribution. A transition is a sample $(s, a, s’, r)$ observed when an agent from state $s$ takes an action $a$ on the environment and lands in state $s’$ with a reward $r$. Underlying assumption of an MDP is the Markov process. Basically what the Markov assumption means is that the future depends on the present independent of the past. Mathematically,&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;p(S_{t+1} | S_{t}) = p(S_{t+1} | S_{t}, S_{t-1},....,S_{1})&lt;/script&gt;
 
@@ -25,9 +27,9 @@
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;V_{\pi}(s) = E_{\pi}[G_t | S_{t} = s]&lt;/script&gt;
 
-&lt;p&gt;Here $G_{t}$ is the total discounted return, defined as $\sum_{k=1}^{\infty} \gamma^{k}R_{t+k}$. The discount factor $\gamma$ is an interesting inclusion. The idea is that immediate rewards are more valuable than later rewards. But it exists mainly because it gives nice mathematical properties for convergence.&lt;/p&gt;
+&lt;p&gt;Here $G_{t}$ is the total discounted return, defined as $\sum_{k=0}^{\infty} \gamma^{k}R_{t+k+1}$. The discount factor $\gamma$ is an interesting inclusion. The idea is that immediate rewards are more valuable than later rewards. An agent with $\gamma=0$ is considered short-sighted as it aims to maximize only $R_{t+1}$.  As $\gamma$ approaches $1$, the agent gives more weight to future rewards. Inclusion of discount factor gives nice mathematical properties required for convergence.&lt;/p&gt;
 
-&lt;p&gt;$V_{\pi}(s)$ gives us the average reward an agent receives if it follows policy $\pi$ from state $s$. For process which have a nice start state and an end state (also called as terminal state), we call each sequence of transitions, an episode. So if the agent starting from a state $s$ takes part in an infinite number of episodes and averages all the total rewards it gets, you get $V_{\pi}(s)$.&lt;/p&gt;
+&lt;p&gt;$V_{\pi}(s)$ gives us the average reward an agent receives if it follows policy $\pi$ from state $s$. For a process which has a definite start state and an end state (also called as terminal state), we define an &lt;em&gt;episode&lt;/em&gt; as the sequence of transitions from start to end. So if the agent starting from a state $s$ takes part in many such episodes following policy $\pi$ and averages all the total rewards it gets you get $V_{\pi}(s)$. Estimating $V_{\pi}(s)$ accurately is the key challenge in many RL problems and we have different methods depending on &lt;em&gt;how&lt;/em&gt; we estimate it.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Action Function&lt;/strong&gt; is the expected reward an agent gets from a state $s$ having executed action $a$ following a policy $\pi$, it is defined as,&lt;/p&gt;
 
@@ -36,17 +38,28 @@
 &lt;p&gt;&lt;strong&gt;Bellman Equation&lt;/strong&gt;, one of the most important equations in RL, is a recurrence relation linking the expected reward from current state $s$ and that of next state $s’$. We arrive at a relation by doing a one-step lookahead.&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
- &amp; V_{\pi}(s) = E_{\pi}[G_t | S_{t} = s] &amp; \\
-&amp; = E_{\pi}[R_{t+1} + \gamma*R_{t+1} + \gamma^2*R_{t+2} + .... | S_{t} = s ]  \\
-&amp; = E_{\pi}[R_{t+1} + \gamma*\sum_{k=0}^{\infty} \gamma^{k}R_{t+k+2} | S_t = s]  &amp;  \\
-&amp; = \sum_a \pi(a|s) \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*E_{\pi}\left[\sum_{k=0}^{\infty} \gamma^{k}R_{t+k+2}\bigg| S_{t+1} = s'\right] \right] \\
-&amp; = \sum_a \pi(a|s) \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*V_{\pi}(s') \right]&amp;
-\end{align} %]]&gt;&lt;/script&gt;
+\begin{equation*}
+\begin{split}
+V_{\pi}(s) &amp; = E_{\pi}[G_t | S_{t} = s]\\
+&amp; = E_{\pi}[R_{t+1} + \gamma*R_{t+2} + \gamma^2*R_{t+3} + .... | S_{t} = s ]\\
+&amp; = E_{\pi}\left[R_{t+1} + \gamma*\sum_{k=0}^{\infty} \gamma^{k}R_{t+k+2} | S_t = s\right]\\
+&amp; = \sum_a \pi(a|s) \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*E_{\pi}\left[\sum_{k=0}^{\infty} \gamma^{k}R_{t+k+2}\bigg| S_{t+1} = s'\right] \right]\\
+&amp; = \sum_a \pi(a|s) \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*V_{\pi}(s') \right]
+\end{split}
+\end{equation*} %]]&gt;&lt;/script&gt;
 
+&lt;p&gt;This gives us the &lt;strong&gt;Bellman Expectation Equation&lt;/strong&gt;,&lt;/p&gt;
+
+&lt;p&gt;\begin{equation}
+V_{\pi}(s) = \sum_a \pi(a|s) \sum_{s’} p(s’ | a,s) \left[ r(s,a,s’) + \gamma*V_{\pi}(s’) \right]
+\end{equation}&lt;/p&gt;
+
+&lt;center&gt;
+&lt;img src=&quot;/images/rl-1/bellman_equation_crop.png&quot; align=&quot;middle&quot; width=&quot;50%&quot; height=&quot;50%&quot; /&gt;
+&lt;/center&gt;
 &lt;p&gt;From a state $s$, you can chose different actions $a$, each with probability $\pi(a \mid s)$, and once you fix an action $a$, you can go to different states $s’$ with a probability $p(s’ \mid a,s)$ obtaining a reward $r$ in the process. Now what Bellman Equation means is that, average reward you get from $s$ is the expected reward you get in the transition plus the discounted expected reward of the next state. This is indeed intuitve to expect.&lt;/p&gt;
 
-&lt;p&gt;Thus we have,&lt;/p&gt;
+&lt;p&gt;This helps us writing value functions in the following way,&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;V_{\pi}(s) = \sum_a \pi(a | s) Q_{\pi}(s, a)&lt;/script&gt;
 
@@ -54,63 +67,65 @@
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;Q_{\pi}(s, a) = \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*V_{\pi}(s') \right]&lt;/script&gt;
 
-&lt;p&gt;&lt;strong&gt;Optimal Value Functions&lt;/strong&gt; - In any RL problem, we are interested in finding the &lt;strong&gt;optimal&lt;/strong&gt; policy, that is, how do we behave in the environment so as to get the maximum rewards? Formally, an optimal policy $ \pi_* $ is a policy for $V_{\pi_{*}}(s) \ge V_{\pi}(s) ~ \forall ~ s $ for any policy $\pi$. So for an optimal policy $\pi_*$, the value function is,&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Optimal Value Functions&lt;/strong&gt; - In any RL problem, we are interested in finding the &lt;strong&gt;optimal&lt;/strong&gt; policy. How do we behave in the environment so as to get the maximum rewards? Formally, an optimal policy $ \pi_* $ is a policy for which $V_{\pi_{*}}(s) \ge V_{\pi}(s) ~ \forall ~ s $ for any policy $\pi$. So for an optimal policy $\pi_*$, the value function is,&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;V_*(s) = \max_a Q_*(s, a)&lt;/script&gt;
 
 &lt;p&gt;which can be written as,&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;V_*(s) = \max_a \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*V_{*}(s') \right]&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;V_*(s) = \max_a \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*V_*(s') \right]&lt;/script&gt;
 
-&lt;p&gt;An optimal policy has to obey the Bellman Optimality Equation. So to get the optimal action from a state, the one which is going to give us the most reward, we chose the action which maximizes $Q_{*}(s,a)$. It all boils down to finding $Q_{*}(s,a)$.&lt;/p&gt;
+&lt;p&gt;An optimal policy has to obey the &lt;strong&gt;Bellman Optimality Equation&lt;/strong&gt;. So to get the optimal action from a state, the one which is going to give us the most reward, we chose the action which maximizes $Q_{*}(s,a)$. It all boils down to finding $Q_{*}(s,a)$.&lt;/p&gt;
 
 &lt;p&gt;Here it is essential to understand the difference between &lt;strong&gt;prediction&lt;/strong&gt; problems and &lt;strong&gt;control&lt;/strong&gt; problems. In prediction problems we are interested in finding $V_{\pi}(s)$ and $Q_{\pi}(s,a)$ for all $s$ and $a$ for a given policy $\pi$. In control problems we are interested in finding the optimal policy $\pi_*$ which obeys the opimality equation.&lt;/p&gt;
 
 &lt;p&gt;The three important building blocks in a RL problem are&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Model - Which controls the dynamics of the environment affecting the transition probabilities and rewards ($p(s’\mid a,s)$ and $r(s’\mid a, s)$)&lt;/li&gt;
+  &lt;li&gt;Model - Which controls the dynamics of the environment affecting the transition probabilities and rewards $p(s’\mid a,s)$ and $r(s’\mid a, s)$&lt;/li&gt;
   &lt;li&gt;Value and Action Functions&lt;/li&gt;
   &lt;li&gt;Policy - What action an agent must take from each state&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;Depending on these three categories one can categorize RL algorithms.&lt;/p&gt;
 
-&lt;h2 id=&quot;model-based-methods---dynamic-programming&quot;&gt;Model Based Methods - Dynamic Programming&lt;/h2&gt;
+&lt;h2 id=&quot;model-based-methods&quot;&gt;Model Based Methods&lt;/h2&gt;
 
-&lt;p&gt;Now that we have set up the table, we can talk about how to solve an RL problem. By solving, we are primarily interested in two things. One is to know how good a given policy is i.e what expected reward will the agent get if it follows the policy. This is called as prediction. The second, more imporant problem is that of control, given an agent and an environment, how should the agent behave so as to achieve maximum reward.&lt;/p&gt;
+&lt;p&gt;Now that we have defined the basic building blocks, we can talk about how to solve a Reinforcement Learning problem.  By solving, we are primarily interested in two things. One is to know how good a given policy is i.e. what expected reward will the agent get if it follows the policy. This is called as prediction. The second, more important problem is that of control, given an environment, how should the agent behave so as to achieve maximum reward.&lt;/p&gt;
 
-&lt;p&gt;In Model Based methods, we assume that we are given the model of how the environment works. Concretely, we are given $p(s’ \mid a, s)$ and $r(s’ \mid a, s)$ for all states and action. Since we know this, we can run a &lt;em&gt;simulation&lt;/em&gt; inside our agent’s “head” (also called as planning) and see what action from which state leads to desirable outcomes. Note that the agent is not actually interacting with environment to figure out what works and what doesn’t work. It is just doing a computation in its head to figure that out.&lt;/p&gt;
+&lt;p&gt;In Model Based methods, we assume that we are given the model of how the environment works. Concretely, we are given $p(s’ \mid a, s)$ and $r(s’ \mid a, s)$ for all states and action. Since we know this, we can run a &lt;em&gt;simulation&lt;/em&gt; inside our agent’s “head” (also called as planning) and see what action from which state leads to desirable outcomes. Note that the agent is not actually interacting with environment to figure out what works and what doesn’t work. It is just doing a computation in its head to figure that out. This is exactly what we do in an &lt;strong&gt;expectimax&lt;/strong&gt; tree search.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Policy Evaluation&lt;/strong&gt; is about evaluating a given policy $\pi$. We are interested in finding $V_\pi(s)$ and $Q_\pi(s,a)$. An efficient scalable way to do this is so by an iterative method exploiting the Bellman equation. We know that according to the Bellman Equation,&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;V_{\pi}(s)  = \sum_a \pi(a | s) \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*V_{\pi}(s') \right]&lt;/script&gt;
 
-&lt;p&gt;For $\gamma &amp;lt; 1$ or for eventual termination of all episodes from any state following the policy $\pi$, the existence and uniqueness of $V_\pi$ is guranteed. We exploit the recurrent nature of this equation, thereby giving rise to a Dynamic Programming method. &amp;gt;&lt;/p&gt;
+&lt;p&gt;For $\gamma &amp;lt; 1$ or for eventual termination of all episodes from any state following the policy $\pi$, the existence and uniqueness of $V_\pi$ is guranteed. We exploit the recurrent nature of this equation, thereby giving rise to a Dynamic Programming method.&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;Initialize $V(s) ~ \forall ~ s$ arbitrarily. For terminal states $V(\text{terminal state}) = 0$.&lt;/li&gt;
-  &lt;li&gt;At iteration $k$, for all states perform the update
- 	* &lt;script type=&quot;math/tex&quot;&gt;V_{k+1}(s)  = \sum_a \pi(a | s) \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*V_{k}(s') \right]&lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;At iteration $k$, for all states perform the update,
+ 	 &lt;script type=&quot;math/tex&quot;&gt;V_{k+1}(s)  = \sum_a \pi(a | s) \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*V_{k}(s') \right]&lt;/script&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;$V_k(s)$ is the approximate of $V_{\pi}(s)$ and under certain conditions, we can gurantee that $V_{k}$ converges to $V_{\pi}$ as $k \rightarrow \infty$. The algorithm updates the value of $V_k(s)$ by doing a one-step lookhead into the future to the expected immediate reward it gets plus current estimate of value of the of next state. This is an example of &lt;strong&gt;full backup boostrapping&lt;/strong&gt;. Bootstrapping is the process by which we perform our updates based on our current &lt;em&gt;estimate&lt;/em&gt; of our return rather than the &lt;em&gt;real&lt;/em&gt; return. We call this full backup because we consider all possible actions leading to all possible next states under policy $\pi$ and average over them to perform our update. A process which does not do full backup will only consider a &lt;em&gt;sample&lt;/em&gt; of next state, rather than all possible states. Also each iteration updates the value of &lt;em&gt;every&lt;/em&gt; state. This is quintessential Dynamic Programming.&lt;/p&gt;
+&lt;p&gt;$V_k(s)$ is the approximate of $V_{\pi}(s)$ and under certain conditions, we can guarantee that $V_{k}$ converges to $V_{\pi}$ as $k \rightarrow \infty$. The algorithm updates the value of $V_k(s)$ by doing a one-step look-ahead into the future to the expected immediate reward it gets plus current estimate of value of the next state. This is an example of &lt;strong&gt;full backup boostrapping&lt;/strong&gt;. Bootstrapping is the process by which we perform our updates based on our current &lt;em&gt;estimate&lt;/em&gt; of our return rather than the &lt;em&gt;real&lt;/em&gt; return. We call this full backup because we consider all possible actions leading to all possible next states under policy $\pi$ and average over them to perform our update. A process which does not do full backup will only consider a &lt;em&gt;sample&lt;/em&gt; of next state, rather than all possible states. Also each iteration updates the value of &lt;em&gt;every&lt;/em&gt; state. This is quintessential Dynamic Programming.&lt;/p&gt;
 
-&lt;p&gt;So we now have a method to evaluate a given policy. But we are interested mainly in finding the &lt;strong&gt;optimal&lt;/strong&gt; policy. Which leads to Policy Improvement.&lt;/p&gt;
+&lt;p&gt;So we now have a method to evaluate a given policy. But we are interested mainly in finding the &lt;strong&gt;optimal&lt;/strong&gt; policy. This leads to Policy Improvement.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Policy Improvement&lt;/strong&gt; is about improving a given policy $\pi$ to a better policy $\pi’$ such that $V_{\pi’}(s) \ge V_{\pi}(s)$ for all states $s$. I will stick to deterministic policies. How do we do this?&lt;/p&gt;
 
-&lt;p&gt;Here is when we conisder $Q_{\pi}(s, a)$. Suppose we evaulate $Q_{\pi}(s, a)$ and we figure that it is greater than $V_{\pi}(s)$, this means we are better off with a policy where we select $a$ rather than $\pi(s)$ and then continue following policy $\pi$. We are sure to get more returns under this policy than the policy $\pi$. This is result of &lt;em&gt;policy improvement theorem&lt;/em&gt; which states that if $Q(s, \pi’(s)) \ge V_{\pi}(s)$ for all states $s$, then policy $\pi’$ is a “better” policy than policy $\pi$. That is we can surely say $V_{\pi’}(s) \ge V_{\pi}(s)$ for all states $s$.&lt;/p&gt;
+&lt;p&gt;Here is when we conisder $Q_{\pi}(s, a)$. Suppose we evaulate $Q_{\pi}(s, a)$ and we figure that it is greater than $V_{\pi}(s)$, this means we are better off with a policy where we select $a$ rather than $\pi(s)$ and then continue following policy $\pi$. We are sure to get more returns under this policy than the policy $\pi$. This is result of &lt;em&gt;policy improvement theorem&lt;/em&gt; which states that if $Q(s, \pi’(s)) \ge V_{\pi}(s)$ for all states $s$, then policy $\pi’$ is a better policy than policy $\pi$. That is we can surely say $V_{\pi’}(s) \ge V_{\pi}(s)$ for all states $s$.&lt;/p&gt;
 
 &lt;p&gt;Using this result we are going to get a new &lt;em&gt;better&lt;/em&gt; policy $\pi’$ by doing the following,&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-&amp; \pi'(s) = \arg\max_a Q(s, a) &amp;\\
-&amp;= \arg\max_a \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*V_{\pi}(s') \right]
-\end{align} %]]&gt;&lt;/script&gt;
+\begin{equation*}
+ \begin{split}
+ \pi'(s) &amp; = \arg\max_a Q(s, a)\\
+ &amp; = \arg\max_a \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*V_{\pi}(s') \right]
+ \end{split}
+ \end{equation*} %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;&lt;strong&gt;Policy Iteration&lt;/strong&gt; is about alternating Policy Evaluation and Policy Improvement so that eventually $\pi \rightarrow \pi_*$. In each iteration of Policy Iteration, we do Policy Evaluation to evaluate the current policy $\pi$. This itself may involve several iterations for the values to converge in concurrence with the current policy. Once we complete Policy Evaluation, we perform Policy Improvement, where we do the greedy update as mentioned above. Performing these both for several iterations, we are guranteed that whatever policy we start off with, it eventually converges to the optimal policy $\pi_*$. Of course, the proof for convergence is going to assume certain conditions, which I am not going to get into. But I guess an intuitive understanding is important to get the bigger picture. The following flow image from Richard Sutton’s book explains the process pretty well.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Policy Iteration&lt;/strong&gt; is about alternating Policy Evaluation and Policy Improvement so that eventually $\pi \rightarrow \pi_*$. In each iteration of Policy Iteration, we do Policy Evaluation to evaluate the current policy $\pi$. This itself may involve several iterations for the values to converge in concurrence with the current policy. Once we complete Policy Evaluation, we perform Policy Improvement, where we do the greedy update as mentioned above. Executing both for several iterations, we are guaranteed that whatever policy we start off with, it eventually converges to the optimal policy $\pi_*$. Of course, the proof for convergence is going to assume certain conditions, which I am not going to get into. But I guess an intuitive understanding is important to get the bigger picture. The following flow image from &lt;a href=&quot;https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html&quot;&gt;Richard Sutton’s book&lt;/a&gt; explains the process pretty well.&lt;/p&gt;
 
 &lt;p align=&quot;center&quot;&gt;
 &lt;img src=&quot;/images/rl-1/policy_iteration.png&quot; /&gt;
@@ -124,7 +139,7 @@
 
 &lt;h2 id=&quot;model-free-methods&quot;&gt;Model Free Methods&lt;/h2&gt;
 
-&lt;p&gt;This is the most important class of methods in RL and is essentially what RL is. Core of RL is to provide a mathematical framework by which an agent can &lt;em&gt;learn&lt;/em&gt; how to perform well in an environment by repeatedly interacting with it by some trial and error mechanism. So far we haven’t done any learning. We just ran a simulation in our head to compute what is good and what is bad. We were able to do that only because some nice oracle gave us how the environment works. That’s not how the real world works.&lt;/p&gt;
+&lt;p&gt;The core of Reinforcement Learning is to provide a mathematical framework using which an agent can &lt;em&gt;learn&lt;/em&gt; how to perform well in an environment by repeatedly interacting with it by some trial and error mechanism. So far we haven’t done any learning. We just ran a simulation in our head to compute what is good and what is bad. We were able to do that only because a nice oracle gave us how the environment behaves. That’s not how the real world works.&lt;/p&gt;
 
 &lt;p&gt;What exactly is the difference between Model Based and Model Free? Let’s take an example. Suppose we want to find the average age of students in a RL course. There are two ways to do it.&lt;/p&gt;
 
@@ -134,26 +149,26 @@
 
     &lt;ul&gt;
       &lt;li&gt;
-        &lt;script type=&quot;math/tex; mode=display&quot;&gt;E[\text{age}] = \sum_x p(x)x&lt;/script&gt;
+        &lt;p&gt;$ E[\text{age}] = \sum_x p(x)x $&lt;/p&gt;
       &lt;/li&gt;
-      &lt;li&gt;Here $p(x)$ is the probability that a student in the class is of age $x$.&lt;/li&gt;
+      &lt;li&gt;
+        &lt;p&gt;Here $p(x)$ is the probability that a student in the class is of age $x$.&lt;/p&gt;
+      &lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
   &lt;li&gt;
     &lt;p&gt;Suppose we didn’t know any such probability distribution, the straightfoward way is to take a &lt;em&gt;sample&lt;/em&gt; of $N$ students, and get their average age. We know that for sufficiently large $N$, we will get a very good estimate of average age.&lt;/p&gt;
     &lt;ul&gt;
-      &lt;li&gt;
-        &lt;script type=&quot;math/tex; mode=display&quot;&gt;E[\text{age}] = \sum_x \frac{x}{N}&lt;/script&gt;
-      &lt;/li&gt;
+      &lt;li&gt;$E[\text{age}] = \sum_x \frac{x}{N}$&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;The second case is what we call as model free. In any real world scenario, we are no way going to get the model of how our environment works. We are &lt;strong&gt;not&lt;/strong&gt; going to get $p(s’\mid s,a)$ and $r(s’\mid s,a)$ in some nice lookup table. A smart agent &lt;strong&gt;learns&lt;/strong&gt; the dynamics of the environment by interacting with it.&lt;/p&gt;
 
-&lt;p&gt;How do we make our agent &lt;em&gt;learn&lt;/em&gt;? Our agent is going to perform an actual action on the environment and get an immediate reward. We want actions leading to good rewards to get reinforced in a positive way and actions leading to bad rewards to get discouraged. In the previous section, we quantified this with Value Functions and Action Functions. We then calculated them for a given policy and developed a mechanism to improve that policy. We were able to compute this only because we knew the &lt;strong&gt;model&lt;/strong&gt; of the environment - $p(s’\mid a,s)$ and $r(s’\mid a,s)$ in a nice lookup table fashion. In model free methods, we are not going to care about the model. We are still going to work with the Bellman Equation framework BUT we are not going to use $p(s’\mid a,s)$ explicitly (because we don’t know them!). We implictly learn about $p(s’ \mid a,s)$ in our learning process and never care about explicitly calculating it.&lt;/p&gt;
+&lt;p&gt;How do we make our agent &lt;em&gt;learn&lt;/em&gt;? Our agent is going to perform an actual action on the environment and get an immediate reward. We want actions leading to good rewards to get reinforced in a positive way and actions leading to bad rewards to get discouraged. In the previous section, we quantified this with Value Functions and Action Functions. We then calculated them for a given policy and developed a mechanism to improve that policy. We were able to compute this only because we knew the &lt;strong&gt;model&lt;/strong&gt; of the environment - $p(s’\mid a,s)$ and $r(s’\mid a,s)$ in a nice lookup table fashion. In model free methods, we are not going to care about the model. We are still going to work with the Bellman Equation framework BUT we are not going to use $p(s’\mid a,s)$ explicitly (because we don’t know them!). We implicitly learn about $p(s’ \mid a,s)$ in our learning process and never care about explicitly calculating it.&lt;/p&gt;
 
-&lt;p&gt;It is important to understand that in these model free methods, we do &lt;em&gt;real&lt;/em&gt; actions on the environment. We don’t do any simulation in the head. We learn that jumping into the fire is bad by actually jumping into the fire and getting killed.&lt;/p&gt;
+&lt;p&gt;A key point to note here is that we can still do learning with model based methods. If we don’t know the model, we can &lt;em&gt;learn&lt;/em&gt; the model! Once we learn the model we can do planning as described in the previous section. But unfortunately model-based methods have not been able to do as well as model-free methods in complicated domains. A recent paper from Silver et al. 2016 &lt;a href=&quot;https://arxiv.org/abs/1612.08810&quot;&gt;Predictron&lt;/a&gt; provides an end to end framework for learning and planning&lt;/p&gt;
 
 &lt;p&gt;In &lt;strong&gt;Monte Carlo&lt;/strong&gt; methods, we calculate the Value Function and Action Function in a relatively straightfoward empirical fashion by averaging the sample returns. These methods work for episodic problems where there is a clear start state and end state (thereby marking an “episode”).&lt;/p&gt;
 
@@ -161,31 +176,30 @@
 
 &lt;ul&gt;
   &lt;li&gt;For a policy $\pi$, start from state $s$ and follow the policy till you reach the end of the episode. Say you generate a sequence $(S_1, A_1, R_2, S_2, A_2,…,S_{T-1},A_{T-1},R_{T}, S_{T})$.&lt;/li&gt;
-  &lt;li&gt;For each state $s$ occuring in the episode calculate the return (total reward) obtained from the state till the end and
-average it. That’s what $V(s)$ is.&lt;/li&gt;
+  &lt;li&gt;For each state $s$ occurring in the episode calculate the return $G_{t} = \sum_{k=0}^{T-1} \gamma^{k}R_{t+k+1}$ obtained from the state till the end and average it. This gives an estimate for $V(s)$.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;Repeat the above two steps for as many episodes as possible. It is mathematically provable that the estimate we get for $V(s)$ eventually converges to $V_{\pi}(s)$.&lt;/p&gt;
 
-&lt;p&gt;We are literally calculating the average reward we can get from each state under a policy. That is essentially what $V_{\pi}$ is. Pretty straightfoward eh?&lt;/p&gt;
+&lt;p&gt;We are literally calculating the average reward we can get from each state under a policy. That is essentially what $V_{\pi}$ is. Pretty straightforward eh?&lt;/p&gt;
 
 &lt;p&gt;How do we find the optimal policy? This is where things get interesting.&lt;/p&gt;
 
 &lt;p&gt;Whenever we don’t know the model, it is always useful to estimate the action value $Q$, rather than the value function $V$. This is mainly because at the end of the day we are interested in what action to take from each state rather than what reward we get from that state. It is more useful to know $Q_{*}(s,a)$ than $V_{*}(s)$. Why? Knowing $V_{*}(s)$ is pretty useless because we wouldn’t know what action an agent must take from state $s$. For that we have to do a one-step lookahead and arrive at the Bellman Optimality Equation.&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\pi_{*}(s)  = \arg\max_a \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*V_{*}(s') \right]&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\pi_*(s)  = \arg\max_a \sum_{s'} p(s' | a,s) \left[ r(s,a,s') + \gamma*V_*(s') \right]&lt;/script&gt;
 
 &lt;p&gt;We can’t do this because we don’t know the model! We got away in DP because we knew the model and we could afford to do this. But not now. On the other hand if we know $Q_{*}(s, a)$, we can just do,&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\pi_{*}(s) = \arg\max_a Q_{*}(s, a)&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\pi_*(s) = \arg\max_a Q_*(s, a)&lt;/script&gt;
 
-&lt;p&gt;&lt;em&gt;So in all model free methods the focus is on estimating $Q_{*}(s,a)$.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;So in all model free problems involving control the focus is on estimating $Q_*(s,a)$.&lt;/p&gt;
 
 &lt;p&gt;We have a MC method to estimate $Q_{\pi}(s, a)$ (exactly same procedure used to estimate $V_{\pi}(s)$). Then we do policy improvement to get a better policy $\pi’$ and keep doing this alternatively to converge at $\pi_{*}$. Thus we may be tempted to think we have a mechanism for finding the optimal policy in model free case. Is that so? Not quite.&lt;/p&gt;
 
 &lt;p&gt;The main problem in this case is that while following a policy, we are going to perform one set of actions and that is going to lead us to one set of states. Let’s say we follow a deterministic policy $\pi$. From state $s$, we are going to take only one action $\pi(s)$. While we do MC Policy Evaluation, we will only get an estimate for $Q_{\pi}(s, \pi(s))$ and $Q_{\pi}(s, a)$ for all other actions $a \neq \pi(s)$ wouldn’t improve because we haven’t visited them at all. Now when we do the policy improvement step, &lt;em&gt;obviously&lt;/em&gt; only $\pi(s)$ will stand out. So we won’t be effectively improving the policy at all! To improve a policy we have to learn action values for all state-action pairs, not just our current policy. We need to correctly estimate $Q_{\pi}(s, a)$ for all actions $a$ from a given state $s$. How do we do this?&lt;/p&gt;
 
-&lt;p&gt;This is the exploration problem. What we do is ensure a continual exploration. We want every state-action pair to be visited an infinite number of times when we execute infinite number of epiosdes. How we do achieve this? We follow an $\epsilon-$greedy strategy for this. In this strategy we want to ensure $\pi(a \mid s) &amp;gt; 0$ for all $a$. With a probability of $\epsilon$ we select a random action and with a probability of $1-\epsilon$ we sleect a greedy action. By following this policy, and doing policy evaluation and improvement alterantively, we can eventually converge to the optimal policy $\pi_{*}$. Following image from Sutton’s book nicely captures this.&lt;/p&gt;
+&lt;p&gt;This is the exploration problem. What we do is ensure a continual exploration. We want every state-action pair to be visited an infinite number of times when we execute infinite number of episodes. How we do achieve this? We follow an $\epsilon-$greedy strategy for this. In this strategy we want to ensure $\pi(a \mid s) &amp;gt; 0$ for all $a$. With a probability of $\epsilon$ we select a random action and with a probability of $1-\epsilon$ we select a greedy action. By following this policy, and doing policy evaluation and improvement alternatively, we eventually converge to the optimal policy $\pi_{*}$. Following image from Sutton’s book nicely captures this.&lt;/p&gt;
 
 &lt;table&gt;
   &lt;tbody&gt;
@@ -196,19 +210,19 @@ average it. That’s what $V(s)$ is.&lt;/li&gt;
   &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;p&gt;Note that the arrow does not completely touch the top line because we don’t want to completely evaluate $Q_{\pi}$ for each intermediate policy. We are inetersted only in the optimal policy. An extreme case of this is the Value Iteration in the previous section, where do do evaluation step for only one iteration. For MC methods, after each episode we can have an estimate for $Q_{\pi}(s,a)$ (this wouldn’t have converged to the true value, but we don’t care) and update the policy with policy improvement step. The policy $\pi$ we will be following will be the $\epsilon-$greedy policy.&lt;/p&gt;
+&lt;p&gt;Note that the arrow does not completely touch the top line because we don’t want to completely evaluate $Q_{\pi}$ for each intermediate policy. We are interested only in the optimal policy. An extreme case of this is the Value Iteration in the previous section, where do do evaluation step for only one iteration. For MC methods, after each episode we can have an estimate for $Q_{\pi}(s,a)$ (this wouldn’t have converged to the true value, but we don’t care) and update the policy with policy improvement step. The policy $\pi$ we will be following will be the $\epsilon-$greedy policy.&lt;/p&gt;
 
 &lt;p&gt;So we now have a rough idea on how to learn the optimal policy with Monte Carlo Control. But our focus will be on another interesting model free method called TD-Learning.&lt;/p&gt;
 
 &lt;h2 id=&quot;td-learning&quot;&gt;TD-Learning&lt;/h2&gt;
 
-&lt;p&gt;TD-Learning combines ideas from both DP and Monte Carlo methods. One main disadvantage in MC methods is that one has to wait till the end of episode to calculate $G_t$. This is a problem in episodes which don’t come to an end. In TD-methods, we udpate the value of current state based on the estimated value of next state (boostrapping). In a way, this is exactly what we did in DP. But the difference is that unlike  DP, we don’t require the model of the environment. We learn from raw experience by sampling. We don’t do a full width backup like how we do in DP. In DP we consider all possible actions from a current state and do an update by calculating the average. We are just simulating and planning in the head. But we cannot do this in TD (or even in MC) because once we take an action, on the real world, we are already in the next state. We can’t go back and do another action. But no worries, math behind TD-Learning guarantees that eventually (??), everything will converge to the correct values with certain assumptions in place (??).&lt;/p&gt;
+&lt;p&gt;TD-Learning combines ideas from both Dynamic Programming and Monte Carlo methods. One main disadvantage in MC methods is that one has to wait till the end of episode to calculate $G_t$. This is a problem in episodes which don’t come to an end. In TD-methods, we update the value of current state based on the estimated value of next state (bootstrapping). In a way, this is exactly what we did in DP. But the difference is that unlike  DP, we don’t require the model of the environment. We learn from raw experience by sampling. We don’t do a full width backup like how we do in DP. In DP, we consider all possible actions from a current state and do an update by calculating the average. We are just simulating and planning in the head. But we cannot do this in TD (or even in MC) because once we take an action, on the real world, we are already in the next state. We can’t go back and do another action.&lt;/p&gt;
 
 &lt;p&gt;In TD Learning, at its simplest form called TD(0) learning, at every time step $t$ we do&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;V(S_{t}) \leftarrow V(S_{t}) + \alpha*[R_{t+1} + \gamma V(S_{t+1}) - V(S_{t})]&lt;/script&gt;
 
-&lt;p&gt;The key idea is that to know how good $V(S_t)$ is, in MC, you had to wait till the end of episode to calculate the true return $G_{t}$. But you already have an estimate of $V_{S_{t+1}}$ and since $S_{t}$ leads to $S_{t+1}$, it is reasonable to expect that their values are linked in a certain way. If the policy is deterministic and $s$ always leads to $s’$, then value of $s$ is indeed the intermediate reward plus value of $s’$.&lt;/p&gt;
+&lt;p&gt;The key idea is that to know how good $V(S_t)$ is, in MC, you had to wait till the end of episode to calculate the true return $G_{t}$. But you already have an estimate of $V(S_{t+1})$ and since $S_{t}$ leads to $S_{t+1}$, it is reasonable to expect that their values are linked in a certain way. If the policy is deterministic and $s$ always leads to $s’$, then value of $s$ is indeed the intermediate reward plus value of $s’$.&lt;/p&gt;
 
 &lt;p&gt;The psuedocode for TD(0) to find $V_{\pi}(s)$ can be written as&lt;/p&gt;
 
@@ -233,7 +247,7 @@ average it. That’s what $V(s)$ is.&lt;/li&gt;
 
 &lt;p&gt;There is a really nice example from Sutton’s book which illustrates the difference between TD(0) and MC methods when a batch data of experiences is given. In general MC methods converges to estimates which minimize the mean total squared error between the true value and estimated value whereas TD methods converges to a maximum likelihood estimate of the Markov Model which explains the data.&lt;/p&gt;
 
-&lt;p&gt;The following diagram from David Silver’s RL course presents a unified view of all the models we have discussed so far.&lt;/p&gt;
+&lt;p&gt;The following diagram from &lt;a href=&quot;http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html&quot;&gt;David Silver’s RL lectures&lt;/a&gt; presents a unified view of all the models we have discussed so far.&lt;/p&gt;
 
 &lt;p align=&quot;center&quot;&gt;
 &lt;img src=&quot;/images/rl-1/unified_view.png&quot; /&gt;
@@ -372,13 +386,13 @@ average it. That’s what $V(s)$ is.&lt;/li&gt;
 &lt;p&gt;You get a $+1$ reward if you exit the top right square and a $-1$ reward if you exit the one beneath it.
 You can see the agent learning from experience.&lt;/p&gt;
 
-&lt;p&gt;After $100$ epsiodes this is what it has learnt,&lt;/p&gt;
+&lt;p&gt;After $100$ episodes this is what it has learnt,&lt;/p&gt;
 
 &lt;p align=&quot;center&quot;&gt;
 &lt;img src=&quot;/images/rl-1/sarsa_100.png&quot; /&gt;
 &lt;/p&gt;
 
-&lt;p&gt;For the top right square, the action value has converged to a vaue of $+1$. But for the one beneath it, it still remains as $-0.49$, it means the agent has not visited that enough. It doesn’t because we are following an $\epsilon$-greedy policy so $70$% of the time the agent chooses to avoid it because just after visiting it once it has realized that square stinks. Though the action value for other states have not yet converged to the optimal value, you can already see that the agent has discovered the optimal policy.&lt;/p&gt;
+&lt;p&gt;For the top right square, the action value has converged to a value of $+1$. But for the one beneath it, it still remains as $-0.49$, it means the agent has not visited that enough. It doesn’t because we are following an $\epsilon$-greedy policy so $70$% of the time the agent chooses to avoid it because just after visiting it once it has realized that square stinks. Though the action value for other states have not yet converged to the optimal value, you can already see that the agent has discovered the optimal policy.&lt;/p&gt;
 
 &lt;p&gt;After $1000$ episodes this is the result,&lt;/p&gt;
 
@@ -396,11 +410,9 @@ You can see the agent learning from experience.&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;Q(S_{t},A_{t}) \leftarrow Q(S_{t}, A_{t}) + \alpha [(R_{t+1} + \gamma \max_a Q(S_{t+1}, a)) - Q(S_{t}, A_{t})]&lt;/script&gt;
 
-&lt;p&gt;In Q-Learning, the update is made towards the optimal Q-Value, but the next action is chosen from $\epsilon$-greedy. In SARSA, the update is made towards Q-Value of an actual action chosen from $\epsilon$-greedy. That is the key difference. The control policy towards which the update is made is the same policy by which the agent is moving but in Q-Learning the update is made towards the greedy policy irrespective of what policy is being actually followed by the agent. This is why SARSA is on-policy but Q-Learning is off.&lt;/p&gt;
+&lt;p&gt;In Q-Learning, the update is made towards the optimal Q-Value, but the next action is chosen from $\epsilon$-greedy. In SARSA, the update is made towards Q-Value of an actual action chosen from $\epsilon$-greedy. That is the key difference. The control policy towards which the update is made is the &lt;em&gt;same&lt;/em&gt; policy by which the agent is moving but in Q-Learning the update is made towards the greedy policy irrespective of what policy is actually followed by the agent. This is why SARSA is on-policy but Q-Learning is off.&lt;/p&gt;
 
-&lt;p&gt;Difference between Q-Learning and SARSA is beautifully illustrated by the Cliff example from Sutton’s book. I found this &lt;a href=&quot;https://studywolf.wordpress.com/2013/07/01/reinforcement-learning-sarsa-vs-q-learning/&quot;&gt;blog post&lt;/a&gt; to recreate that experiment quite useful to understand the difference.&lt;/p&gt;
-
-&lt;p&gt;I will also illustrate the difference with the DiscountGrid environment from Berkeley. It is quite similar to the cliff example from Sutton’s book. This is the environment&lt;/p&gt;
+&lt;p&gt;Difference between Q-Learning and SARSA is beautifully illustrated by the Cliff example from Sutton’s book. I will also illustrate the difference with the DiscountGrid environment from the Berkeley AI projects. It is quite similar to the cliff example from Sutton’s book. This is the environment&lt;/p&gt;
 
 &lt;p align=&quot;center&quot;&gt;
 &lt;img src=&quot;/images/rl-1/cliff_example.png&quot; /&gt;
@@ -424,6 +436,19 @@ You can see the agent learning from experience.&lt;/p&gt;
 
 &lt;p&gt;You can see that Q-Learning has learnt the optimal policy. So if you tune $\epsilon$ to zero after the experiment, Q-Learning gives the most reward. Q-Learning is updating its Q-Value towards the greedy policy so is not influenced by the random component invovled in pushing it down the cliff. However since Q-Learning takes the risky route but is actually following the $\epsilon$-greedy policy, it falls into the cliff occassionally thereby giving it a lesser average reward than SARSA.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;Next Post: Linear Function Approximators&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;p&gt;In all the algorithms we have discussed so far we have represented the value function and action function as lookup tables. This is useless for problems with continuous or infinite state or action spaces, which is what the real world is! So no more tables to tackle problems which matter. We will see how we can learn optimal policies by representing the state and action spaces with a function approximators.&lt;/p&gt;</content><summary type="html">An introductory post on RL briefing the theory and then diving into building RL agents with Python</summary></entry></feed>
+&lt;h2 id=&quot;whats-next&quot;&gt;What’s Next?&lt;/h2&gt;
+
+&lt;p&gt;This concludes the background chapter for Reinforcement Learning. So far we have been dealing with methods where we directly learn the value function and action function which are stored in tabular format. This approach doesn’t scale to bigger problems for two reasons.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;A lookup table approach will not work effectively for problems having continuous or infinite state spaces. There is finite amount of memory in the RAM. We will quickly hit the ceiling for any interesting RL problem.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Two different states $S$ and $S’$ might be very similar in structure but from our current methods we will have to learn the value functions for both of them separately. For example, consider a game of PacMan where the agent has just moved one step to the left but everything else in the environment remains in the same. It is reasonable to expect $V(S) \approx V(S’)$, so we shouldn’t have to learn them separately. We want general methods so that we have good estimates for &lt;em&gt;unseen&lt;/em&gt; states when we have already visited a similar state in the past.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This leads us to function approximators. Instead of directly learning the value and action function, we &lt;strong&gt;parametrize&lt;/strong&gt; them. This gives our methods the capacity to generalize to unseen state,action pairs.&lt;/p&gt;</content><summary type="html">An introductory post on RL briefing the theory and then diving into building RL agents with Python</summary></entry></feed>

@@ -257,7 +257,7 @@ nav {
   }
 
   .read-more {
-    text-transform: uppercase;
+    /*text-transform: uppercase; */
     font-size: 15px;
   }
 }
@@ -279,14 +279,14 @@ nav {
 
 }
 .wrapper-footer {
-  margin-top: 50px;
+  margin-top: 20px;
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
   background-color: $lightGray;
 }
 
 footer {
-  padding: 20px 0;
+  padding: 20px 0px 0px 0px;
   text-align: center;
 }
 
@@ -300,6 +300,7 @@ html, body {
     height: 100%;
     margin: 0 auto -85px; /* the bottom margin is the negative value of the footer's height */
 }
+
 .wrapper-footer, .push {
     height: 85px; /* .push must be the same height as .footer */
 }
