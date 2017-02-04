@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Deep Neural Networks as Function Approximators – Computational Rationality – Blog about my work in AI</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="A post highlighting the reasons and history behind using Neural Networks in Reinforcement Learning, followed by some Python code to get them working in action!" />
+    <meta property="og:description" content="A post highlighting the reasons and history behind using Neural Networks in Reinforcement Learning, followed by some Python code to get them working in action!" />
+    
+    <meta name="author" content="Computational Rationality" />
+
+    
+    <meta property="og:title" content="Deep Neural Networks as Function Approximators" />
+    <meta property="twitter:title" content="Deep Neural Networks as Function Approximators" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Computational Rationality - Blog about my work in AI" href="/feed.xml" />
+    <!--<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="added-wrapper">
+      <div class="wrapper-masthead">
+        <div class="container">
+          <header class="masthead clearfix">
+            <a href="/" class="site-avatar"><img src="https://avatars2.githubusercontent.com/u/4838833?v=3&s=460" /></a>
+
+            <div class="site-info">
+              <h1 class="site-name"><a href="/">Computational Rationality</a></h1>
+              <p class="site-description">Blog about my work in AI</p>
+            </div>
+
+            <nav>
+              <a href="/about">About</a>
+            </nav>
+          </header>
+        </div>
+      </div>
+
+      <div id="main" role="main" class="container">
+        <article class="post">
+  <header class="post-header">
+  	<h1>Deep Neural Networks as Function Approximators</h1>
+  	<p class="meta">Oct 25, 2016</p>
+  </header>
+
+  <div class="entry">
+    <p>In the last post, I introduced the fundamentals of Reinforcement Learning and towards the end I discussed the limitations in using traditional tabular methods for learning value and action functions. This motivated the need for using function approximators.</p>
+
+<h2 id="why-deep-learning">Why Deep Learning?</h2>
+
+<p>Instead of having $Q(S, A)$, we parametrize our action function as $Q = f(S, A, \theta)$ where $f$ is a differentiable function which takes $S$ and $A$ as inputs with weights as $\theta$. The idea is to learn the Q-Values by a training procedure similar to a supervised learning setting. Instead of labeled data we will be using the scalar rewards from the environment as the training signal. Since our core objective is to generalize to unseen states, we want to capture the state $S$ into a set of meaningful <em>features</em> related to the task at hand. One way to do this is manually select features which we think captures the dynamics of the problem. We can represent a state in the form $S = \left[   x_{1}, x_{2},…,x_{D}\right]$ and model the Q-function as linear combination of such features.</p>
+
+<script type="math/tex; mode=display">Q(S, A, \theta) = \sum_{i=0}^{D}\theta_{i}x_{i}</script>
+
+<p>Now all we have to do is find optimal weights  $\theta_{i}$. A straightforward way to do this would be to use the classic stochastic gradient descent used frequently in function optimization. To construct a loss function we can use the TD-target we used in tabular Q-Learning. The loss function can be defined as a mean-squared error of our current estimate and the TD-target from our recent sample.</p>
+
+<p>Let’s say at time step $i$, we transition from state $s$ to state $s’$ by taking action $a$ and we observe an intermediate reward $r$. The loss function for stochastic gradient descent can be constructed as follows,</p>
+
+<script type="math/tex; mode=display">L_i(\theta)  = (y_i - Q(s,a;\theta))^2</script>
+
+<p>where $y_{i} = r + \gamma \max_{a’}Q(s’,a’; \theta)$. Now we can update parameters $\theta$ by gradient descent using the gradient $\nabla_\theta  L_i(\theta)$. We do this for many episodes and hope that $Q(S, A; \theta)$ converge to $Q_*(S, A)$.</p>
+
+<p>But there two main problems with this approach,</p>
+
+<ul>
+  <li>First, we are manually selecting features. This means our algorithms are task-dependent. We won’t able to build <em>general</em> agents. It is not feasible for a human to hand-engineer features for each task. This is a serious roadblock to achieving human-level intelligence.</li>
+  <li>Second, linear combination of features are simply not interesting enough! They severely restrict the agent from learning useful policies required for tackling complicated environments.</li>
+</ul>
+
+<p>This is exactly where <strong>Deep Neural Networks</strong> enter the picture. Recent breakthroughs in supervised learning like <a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf">Krizhevsky et all</a> have made it possible to extract meaningful features from just raw sensory data. The idea is to combine Deep Learning methods with Reinforcement Learning so as to solve complex control problems which have high-dimensional sensory input.</p>
+
+<p>But it is not so easy to directly combine deep learning methods with RL because of the way data is generated in RL. The key problems are,</p>
+
+<ul>
+  <li>Deep Learning methods assume large amounts of <em>labeled</em> training data. The only training signal in RL is the scalar reward which is sparse and delayed. An agent might have to wait for thousands of time-steps before it receives any reward. This makes it difficult to generate a strong supervised training signal required for deep learning.</li>
+  <li>Deep Learning methods also assume training data to be independent and coming from a fixed distribution. Sequential data from RL by design is extremely correlated and the distribution from which data is generated changes as the agent adjusts its policy.</li>
+</ul>
+
+<p>Because of these two problems, it is difficult to train neural networks for RL problems leading to unstable and diverging learning curves. But <a href="https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf">Mnih et all.</a> proposed a novel approach called Deep Q-Network(DQN) which overcame these problems and was able to successfully learn super-human policies for various Atari games from just <strong>raw pixel data</strong>.</p>
+
+<p>Two key ideas which were employed,</p>
+
+<ul>
+  <li>
+    <p><strong>Experience Replay</strong> - To break correlation from sequential transitions, the data is stored in a <em>replay memory</em>, and after regular intervals randomly sampled to generate mini-batch required for training using stochastic gradient descent.</p>
+  </li>
+  <li>
+    <p>Separate target network - In order to stabilize training, the target required for supervised learning is generated from a separate target network. After regular intervals the target is updated with the agent’s current model parameters. Specifically, The loss function at iteration $i$ is, $L_i(\theta_i) = ((r + \gamma \max_{a’}Q(s’,a’,\theta_{i-1})) - Q(s,a,\theta_{i}) )^{2}$. Note that the target is from $\theta_{i-1}$ which is kept <em>fixed</em> during the optimization process. This deals with the problem of non-stationary targets which causes the neural network to diverge.</p>
+  </li>
+</ul>
+
+<p>Following figure from <a href="http://icml.cc/2016/tutorials/deep_rl_tutorial.pdf">David Silver’s Deep RL tutorial</a> illustrates the architecture.</p>
+
+<center>
+<img src="/images/rl-2/dqn.png" />
+</center>
+
+<p>This way DQN provides an end-to-end framework for learning $Q(s,a)$ from pixels $s$. The algorithm was tested on the Atari domain. Inputs from Arcade Learning Emulator are 210x160x3 RGB images which are preprocessed to grayscale 84x84 images. To give the agent a sense of relative motion which we naturally expect in games, the input to the network is a stack of raw pixels from last 4 frames. Output of the network are the Q-Values for 18 possible actions. So one single forward pass for an input $s$ should give $Q(s,a)$ for all actions $a$. The reward is the difference in the game score for the transition. The network architecture and hyperparameters are fixed for all Atari games. Essentially we have <strong>one</strong> agent learning to play <strong>different</strong> Atari games to super-human level from just raw pixels without any help from a human.</p>
+
+<h2 id="policy-gradients-and-actor-critic">Policy Gradients and Actor Critic</h2>
+
+<p>Though DQN was a major breakthrough in Reinforcement Learning, modern Deep RL methods are leaning towards policy based methods. In DQN, the action function was parametrized as $Q(s,a; \theta)$ and policy $\pi$ was derived as $\pi(s) = \arg\max_a Q(s,a)$. But we can directly parametrize the policy and discover policies which maximize the cumulative reward. The key objective is,</p>
+
+<script type="math/tex; mode=display">\max_\theta \mathbb{E}[R \ | \ \pi(s,\theta)]</script>
+
+<p>Where $R$ is the cumulative reward you get starting from state $s$. We are <em>directly</em> adjusting our policy to lead to ones which maximize the cumulative reward. The key intuitions in Policy Gradient methods are,</p>
+
+<ul>
+  <li>Collect trajectories $(s_{0}, a_{0}, r_{0}, s_{1}, a_{1}, …, s_{T-1}, a_{T-1}, r_{T-1}, s_{T})$. Push for trajectories which result into good cumulative rewards. Here we define $R = \sum_{i=0}^{T-1} r_{i}$</li>
+  <li>Make the <em>good</em> actions which resulted in high rewards to be more probable and <em>bad</em> actions less probable.</li>
+</ul>
+
+<p>In order to optimize, we need a concrete objective function. For DQN, the loss function was defined as mean-squared error of TD-Target and current action function. More importantly we need gradients with respect to our parameters $\theta$ in order to push them towards policies maximizing the cumulative reward. For this we use a <em>score function gradient estimator</em> following derivation from <a href="https://www.youtube.com/watch?v=aUrX-rP_ss4">John Schulman’s Deep RL lecture</a>. We are interested in finding gradient of an expression of form $\mathbb{E}_{x \sim p(x | \theta)}[f(x)]$. In RL context $f$ is our reward function, $x$ are our actions sampled from probability distribution $p$, which is the analog for our policy $\pi$.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}
+\begin{split}
+\nabla_\theta\mathbb{E}_{x}[f(x)] &= \nabla_\theta \int p(x | \theta) f(x) dx\\
+&= \int \nabla_\theta p(x | \theta) f(x) dx\\
+&= \int p(x | \theta) \frac{\nabla_\theta p(x | \theta)}{p(x | \theta)} f(x) dx\\
+&= \int p(x | \theta) \nabla \log p(x | \theta) f(x) dx\\
+&= \mathbb{E}_x[f(x) \nabla_\theta \log p(x | \theta)]
+\end{split}
+\end{equation} %]]></script>
+
+<p>This gives us an <em>unbiased</em> estimate for our gradient. All we need to is sample $x_i$ from $p(x | \theta)$ and compute our estimate $\hat{g_i} = f(x_i) \nabla_\theta \log p(x_i | \theta)$. If $f(x)$ measures the “goodness” of a sample $x$, pushing $\theta$ along the direction of $\hat{g_i}$ pushes the log probability of the sample in <em>proportion</em> to how good the sample is. From our derivation, this indeed means that we are pushing for samples which maximizes $\mathbb{E}_x[f(x)]$.</p>
+
+<p>This derivation was for one random variable $x$. How to extend this to an entire trajectory we observe in a RL setting?</p>
+
+<p>Consider trajectory $\tau = (s_{0}, a_{0}, r_{0}, s_{1}, a_{1}, …, s_{T-1}, a_{T-1}, r_{T-1}, s_{T})$. We have cumulative reward $R$ defined as $R = \sum_{t=0}^{T-1} r_{t}$. From the derivation we have,</p>
+
+<script type="math/tex; mode=display">\nabla \mathbb{E}_\tau[R(\tau)] = \mathbb{E}_\tau[R(\tau) \nabla \log p(\tau | \theta)]</script>
+
+<p>Now we can rewrite $p(\tau | \theta)$ as,</p>
+
+<script type="math/tex; mode=display">p(\tau | \theta) = \mu(s_{0}) \prod_{t=0}^{T-1}\left[\pi(a_{t} | s_{t},\theta) P(s_{t+1}, r_t | s_t,a_t)\right]</script>
+
+<p>Here $\mu$ is the probability distribution from which start states are sampled. $P$ denotes the transition function (remember MDP!).</p>
+
+<p>Taking $\log$ and $\nabla_\theta$ on both sides,</p>
+
+<script type="math/tex; mode=display">\nabla_\theta \log p(\tau | \theta) = \nabla_\theta \sum_{t=0}^{T-1} \log \pi(a_{t} | s_{t}, \theta)</script>
+
+<p>Plugging this back into our derivation we have,</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+\nabla_\theta \mathbb{E}_\tau[R] = \mathbb{E}_\tau\left[R\nabla_\theta \sum_{t=0}^{T-1} \log \pi(a_{t} | s_{t}, \theta)\right]
+\end{equation}</script>
+
+<p>The interpretation is that good trajectories (ones with high $R$) are used as supervised training signals analogous to the ones used in classification problems. This is a more direct approach to get optimal policies than what we did in DQN.</p>
+
+<p>The above equation is better written in the following way,</p>
+
+<script type="math/tex; mode=display">\begin{equation}\label{eq:4}
+\nabla_\theta \mathbb{E}_\tau[R] = \mathbb{E}_\tau\left[\sum_{t=0}^{T-1} \nabla_\theta \log \pi(a_{t} | s_{t}, \theta) \sum_{t'=t}^{T-1} r_{t'}\right]
+\end{equation}</script>
+
+<p>This can be interpreted as how we increase the log probability of action $a_{t}$ from state $s_{t}$ in proportion to the total reward we get from state $s_{t}$ <em>onwards</em>; we don’t worry about what happened before $s_t$ for deciding how good action $a_{t}$ is. In practice usually the returns are <em>discounted</em> using a discount factor $\gamma &lt; 1$ to down-weight rewards which are far away in the future.</p>
+
+<p><strong>Policy Gradients on CartPole</strong> - A pole is attached to a cart which moves on a frictionless track. The objective is to balance the pole on the cart. The pendulum starts in an upright position and the agent has to prevent it from falling over. The agent can apply a force of +1 or -1 to the cart. For each time-step a reward of +1 is provided if the agent manages to keep the pole upright. Episode ends when pole is more than 15 degrees with the vertical or the cart is more than 2.4 units from the center.</p>
+
+<p>Each state is a 4 dimensional input denoting horizontal position, velocity, angular position, and angular velocity. We have two actions applying +1 or -1. The policy $\pi(a | s, \theta)$ is modeled by a 2-layer neural network (with ReLU activation) as shown in figure below,</p>
+
+<center>
+<img src="/images/rl-2/2layerNN.png" align="middle" width="50%" height="50%" />
+</center>
+
+<p>This is how we we will define a 2-layer network for policy gradients in Python using <a href="https://www.tensorflow.org/">TensorFlow</a> and <a href="https://keras.io/">Keras</a>,</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">gym</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span><span class="p">,</span> <span class="n">Input</span>
+<span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Model</span>
+
+<span class="k">def</span> <span class="nf">two_layer_net</span><span class="p">(</span><span class="n">inp_dim</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">,</span> <span class="n">num_hidden</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">decay</span><span class="o">=</span><span class="mf">0.99</span><span class="p">):</span>
+	<span class="n">states</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">inp_dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'states'</span><span class="p">)</span>
+	<span class="n">actions</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'actions'</span><span class="p">)</span>
+	<span class="n">rewards</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'rewards'</span><span class="p">)</span>
+
+        <span class="c"># set up the nn layers</span>
+	<span class="n">inputs</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">inp_dim</span><span class="p">,))</span>
+	<span class="n">fc</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">output_dim</span><span class="o">=</span><span class="n">num_hidden</span><span class="p">,</span><span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">)(</span><span class="n">inputs</span><span class="p">)</span>
+	<span class="n">softmax</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">output_dim</span><span class="o">=</span><span class="n">out_dim</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">)(</span><span class="n">inputs</span><span class="p">)</span>
+
+        <span class="c"># prepare the loss function</span>
+	<span class="n">policy_network</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">softmax</span><span class="p">)</span>
+	<span class="n">probs</span> <span class="o">=</span> <span class="n">policy_network</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+	<span class="n">log_probs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">log</span><span class="p">(</span> <span class="n">tf</span><span class="o">.</span><span class="n">clip_by_value</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="mf">1e-20</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="p">)</span>
+	<span class="n">log_probs_act</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span> <span class="n">tf</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">log_probs</span><span class="p">,</span> <span class="n">actions</span><span class="p">),</span> <span class="mi">1</span> <span class="p">)</span>
+
+	<span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">log_probs_act</span><span class="o">*</span><span class="n">rewards</span><span class="p">)</span>
+	<span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="n">lr</span><span class="p">)</span>
+	<span class="n">optimize</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+
+	<span class="n">init_op</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">initialize_all_variables</span><span class="p">()</span>
+	<span class="n">running_reward</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'running_reward'</span><span class="p">)</span>
+	<span class="n">episode_reward</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'episode_reward'</span><span class="p">)</span>
+	<span class="n">tf</span><span class="o">.</span><span class="n">scalar_summary</span><span class="p">(</span><span class="s">"Running Reward"</span><span class="p">,</span> <span class="n">running_reward</span><span class="p">)</span>
+	<span class="n">tf</span><span class="o">.</span><span class="n">scalar_summary</span><span class="p">(</span><span class="s">"Episode Reward"</span><span class="p">,</span> <span class="n">episode_reward</span><span class="p">)</span>
+	<span class="n">summary_op</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">merge_all_summaries</span><span class="p">()</span>
+
+	<span class="n">model</span> <span class="o">=</span> <span class="p">{}</span>
+	<span class="n">model</span><span class="p">[</span><span class="s">'states'</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s">'actions'</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s">'rewards'</span><span class="p">]</span> <span class="o">=</span> <span class="n">states</span><span class="p">,</span><span class="n">actions</span><span class="p">,</span><span class="n">rewards</span>
+	<span class="n">model</span><span class="p">[</span><span class="s">'probs'</span><span class="p">]</span> <span class="o">=</span> <span class="n">probs</span>
+	<span class="n">model</span><span class="p">[</span><span class="s">'optimize'</span><span class="p">]</span> <span class="o">=</span> <span class="n">optimize</span>
+	<span class="n">model</span><span class="p">[</span><span class="s">'init_op'</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s">'summary_op'</span><span class="p">]</span> <span class="o">=</span> <span class="n">init_op</span><span class="p">,</span><span class="n">summary_op</span>
+	<span class="n">model</span><span class="p">[</span><span class="s">'running_reward'</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s">'episode_reward'</span><span class="p">]</span> <span class="o">=</span> <span class="n">running_reward</span><span class="p">,</span> <span class="n">episode_reward</span>
+
+	<span class="k">return</span> <span class="n">model</span>
+</code></pre>
+</div>
+
+<p>In order to collect trajectories using <a href="https://gym.openai.com/">OpenAI Gym</a>, we do the following,</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_episode</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">sess</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
+        <span class="s">"""
+		env - Gym environment object
+		model - A dictionary wrapper defining our policy network
+		sess - A TensorFlow session object
+		actions - action space of the environment
+	"""</span>
+	<span class="n">x</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+	<span class="n">xs</span><span class="p">,</span> <span class="n">acts</span><span class="p">,</span> <span class="n">rs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+	<span class="n">done</span> <span class="o">=</span> <span class="bp">False</span>
+
+	<span class="n">state_ph</span><span class="p">,</span> <span class="n">prob_net</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="s">'states'</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s">'probs'</span><span class="p">]</span>
+	<span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c"># restricting time-steps to 200</span>
+	<span class="k">while</span> <span class="ow">not</span> <span class="n">done</span> <span class="ow">and</span> <span class="n">t</span> <span class="o">&lt;=</span> <span class="mi">200</span><span class="p">:</span>
+		<span class="n">aprob</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">prob_net</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">state_ph</span><span class="p">:[</span><span class="n">x</span><span class="p">]})</span>
+		<span class="n">act</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">actions</span><span class="p">),</span> <span class="n">p</span><span class="o">=</span><span class="n">aprob</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+
+		<span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+		<span class="n">acts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">act</span><span class="p">)</span>  <span class="c"># action (index)</span>
+
+		<span class="n">x</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">actions</span><span class="p">[</span><span class="n">act</span><span class="p">])</span>
+		<span class="n">rs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reward</span><span class="p">)</span>
+		<span class="n">t</span> <span class="o">+=</span> <span class="mi">1</span>
+
+
+	<span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">acts</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rs</span><span class="p">)]</span>
+</code></pre>
+</div>
+
+<p>We need to get discounted returns from each time-step $t$ till the end of the episode. Let us write a function for that,</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">discount_rewards</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
+    <span class="s">""" r: 1D numpy array containing immediate rewards """</span>
+	<span class="n">discounted_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+	<span class="n">running_add</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">size</span><span class="p">)):</span>
+		<span class="n">running_add</span> <span class="o">=</span> <span class="n">running_add</span> <span class="o">*</span> <span class="n">gamma</span> <span class="o">+</span> <span class="n">r</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+		<span class="n">discounted_r</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">running_add</span>
+	<span class="k">return</span> <span class="n">discounted_r</span>
+</code></pre>
+</div>
+
+<p>Now that we a have a model and a routine to collect trajectories, we are all set to train our neural network,</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">train</span><span class="p">():</span>
+	<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s">'CartPole-v0'</span><span class="p">)</span>
+	<span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+	<span class="n">K</span><span class="o">.</span><span class="n">set_session</span><span class="p">(</span><span class="n">sess</span><span class="p">)</span>
+	<span class="n">model</span> <span class="o">=</span> <span class="n">two_layer_net</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+	<span class="n">writer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">SummaryWriter</span><span class="p">(</span><span class="s">'cartpole_logs/2layer-Net'</span><span class="p">,</span> <span class="n">graph</span><span class="o">=</span><span class="n">sess</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+
+	<span class="n">MAX_UPDATES</span> <span class="o">=</span> <span class="mi">2500</span>
+	<span class="n">NUM_BATCH</span> <span class="o">=</span> <span class="mi">4</span>
+
+	<span class="n">avg_reward</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="n">states_ph</span><span class="p">,</span> <span class="n">action_ph</span><span class="p">,</span> <span class="n">rewards_ph</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="s">'states'</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s">'actions'</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s">'rewards'</span><span class="p">]</span>
+	<span class="n">optimize</span><span class="p">,</span> <span class="n">summary_op</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="s">'optimize'</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s">'summary_op'</span><span class="p">]</span>
+	<span class="n">ep_rwd_ph</span><span class="p">,</span> <span class="n">avg_rwd_ph</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="s">'episode_reward'</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s">'running_reward'</span><span class="p">]</span>
+	<span class="n">init_op</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="s">'init_op'</span><span class="p">]</span>
+	<span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">init_op</span><span class="p">)</span>
+
+	<span class="n">T</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="k">while</span> <span class="n">T</span> <span class="o">&lt;</span> <span class="n">MAX_UPDATES</span><span class="p">:</span>
+		<span class="n">batch_s</span><span class="p">,</span> <span class="n">batch_a</span><span class="p">,</span> <span class="n">batch_r</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+		<span class="n">rwds</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_BATCH</span><span class="p">):</span>
+			<span class="n">s_n</span><span class="p">,</span> <span class="n">a_n</span><span class="p">,</span> <span class="n">r_n</span> <span class="o">=</span> <span class="n">run_episode</span><span class="p">(</span><span class="n">env</span><span class="p">,</span><span class="n">model</span><span class="p">,</span><span class="n">sess</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+			<span class="n">disc_r</span> <span class="o">=</span> <span class="n">discount_rewards</span><span class="p">(</span><span class="n">r_n</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">)</span>
+			<span class="n">disc_r</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">disc_r</span><span class="p">)</span>
+			<span class="n">disc_r</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">disc_r</span><span class="p">)</span>
+
+			<span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">r_n</span><span class="p">)</span>
+			<span class="n">rwds</span> <span class="o">+=</span> <span class="n">r</span>
+
+			<span class="n">avg_reward</span> <span class="o">=</span> <span class="n">r</span> <span class="k">if</span> <span class="n">avg_reward</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="o">.</span><span class="mi">99</span> <span class="o">*</span> <span class="n">avg_reward</span> <span class="o">+</span> <span class="o">.</span><span class="mo">01</span> <span class="o">*</span> <span class="n">r</span>
+
+			<span class="n">batch_s</span> <span class="o">=</span> <span class="n">s_n</span> <span class="k">if</span> <span class="n">batch_s</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_s</span><span class="p">,</span> <span class="n">s_n</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+			<span class="n">batch_a</span> <span class="o">=</span> <span class="n">a_n</span> <span class="k">if</span> <span class="n">batch_a</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_a</span><span class="p">,</span> <span class="n">a_n</span><span class="p">)</span>
+			<span class="n">batch_r</span> <span class="o">=</span> <span class="n">disc_r</span> <span class="k">if</span> <span class="n">batch_r</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_r</span><span class="p">,</span> <span class="n">disc_r</span><span class="p">)</span>
+
+
+		<span class="n">_</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">optimize</span><span class="p">,</span> <span class="n">summary_op</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span>
+														<span class="n">states_ph</span><span class="p">:</span> <span class="n">batch_s</span><span class="p">,</span>
+														<span class="n">action_ph</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)[</span><span class="n">batch_a</span><span class="p">],</span>
+														<span class="n">rewards_ph</span><span class="p">:</span> <span class="n">batch_r</span><span class="p">,</span>
+														<span class="n">avg_rwd_ph</span><span class="p">:</span> <span class="n">avg_reward</span><span class="p">,</span>
+														<span class="n">ep_rwd_ph</span><span class="p">:</span> <span class="n">rwds</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">NUM_BATCH</span><span class="p">)</span>
+			<span class="p">})</span>
+
+		<span class="n">ep_rwd</span> <span class="o">=</span> <span class="n">rwds</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">NUM_BATCH</span><span class="p">)</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">'Step </span><span class="si">%</span><span class="s">d, Episode Reward </span><span class="si">%.3</span><span class="s">f, Average Reward </span><span class="si">%.3</span><span class="s">f'</span> <span class="o">%</span> <span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">ep_rwd</span><span class="p">,</span> <span class="n">avg_reward</span><span class="p">))</span>
+		<span class="n">writer</span><span class="o">.</span><span class="n">add_summary</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+		<span class="n">T</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre>
+</div>
+
+<p>The graph below depicts learning curve averaged over ten trials with a cumulative running reward ($\alpha=0.01$) over epoch (one epoch corresponds to 4 episodes). The maximum number of time-steps per episode was 200. So an optimal policy should get a cumulative reward of 200. One can see the neural network converging to an optimal policy.</p>
+
+<center>
+<img src="/images/rl-2/pg_nn_linear.png" align="middle" width="50%" height="50%" />
+</center>
+
+<p>Though policy gradient methods provide a direct way to maximize rewards, they are generally noisy with high variance and take too long to converge. The reason for high-variance is we have to wait till the end of the episode and estimate returns over thousands of actions. One way to reduce variance is by adding a baseline. Suppose $f(x) \ge 0$ for all $x$, then for every sample $x_{i}$, the gradient estimate $\hat{g_i}$ pushes the log probability in proportion to $f(x_i)$. But we want good $x_i$ to be pushed <em>up</em> and bad $x_i$ to be pushed <em>down</em>. We can add a baseline $b$ which will ensure that the gradient discourages the probability of all $x$ for which $f(x) &lt; b$. We can incorporate a baseline directly into the policy gradient equation without introducing any bias,</p>
+
+<script type="math/tex; mode=display">\nabla_{\theta}\mathbb{E}_x[f(x)] = \nabla_{\theta}\mathbb{E}_x[f(x) - b] =  \mathbb{E}_x[(f(x)-b) \nabla_{\theta} \log p(x | \theta)]</script>
+
+<p>Though by injecting $b$ we don’t introduce any bias, we actually don’t know what $b$ to use. An ideal choice would to be have $b = \mathbb{E}[f(x)]$ because we only want to encourage samples which are above-average. If we don’t know $\mathbb{E}[f(x)]$, we will have to <em>estimate</em> it, and by doing so we will be introducing some bias! This is an example of classic <strong>bias-variance</strong> trade-off.</p>
+
+<p>Policy Gradients with baseline can be written as,</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+\nabla_\theta \mathbb{E}_\tau[R] = \mathbb{E}_\tau\left[\sum_{t=0}^{T-1} \nabla_\theta \log \pi(a_{t} | s_{t}, \theta) \left(\sum_{t'=t}^{T-1} \gamma^{t'-t} r_{t'} - b(s_t) \right) \right]
+\end{equation}</script>
+
+<p><strong>Actor-Critic</strong> methods approximate $b(s_t)$ with $V_\pi(s_t)$, the value function for state $s_t$. They measure how better an action $a$ from a given state $s$ is than what returns the agent would have received if it had followed policy $\pi$, thereby <em>critiquing</em> the actor $\pi$. The policy gradient formula can be refined the following way to incorporate this,</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+\nabla_\theta \mathbb{E}_\tau[R] = \mathbb{E}_\tau\left[\sum_{t=0}^{T-1} \nabla_\theta \log \pi(a_{t} | s_{t}; \theta) \left(Q_\pi(s_t,a_t) - b(s_t) \right) \right]
+\end{equation}</script>
+
+<p>Using $b(s_t) \approx V(s_t)$ and defining the advantage function which critiques the actor as $A_\pi(s,a) = Q_\pi(s,a) - V_\pi(s)$, we have the formula for actor-critic,</p>
+
+<script type="math/tex; mode=display">\begin{equation}\label{eq:a3c}
+\nabla_\theta \mathbb{E}_\tau[R] = \mathbb{E}_\tau\left[\sum_{t=0}^{T-1} \nabla_\theta \log \pi(a_{t} | s_{t}; \theta) A_\pi(s_t,a_t) \right]
+\end{equation}</script>
+
+<h2 id="asynchronous-methods">Asynchronous Methods</h2>
+<p>In practice, Actor-Critic methods discussed above are implemented in an asynchronous manner instead of a synchronous approach illustrated in the Python code above. By design policy gradient methods are on-policy. When approximating with neural networks, they still have the same problems as discussed in the beginning of the post : data in a RL setting is non-stationary and extremely correlated. To alleviate these problems, <a href="https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf">Mnih et al. 2013</a> proposed an <em>experience replay</em> mechanism. However this restricts the methods to off-policy RL algorithms. Also, experience replay requires more memory and the DQN approach is computationally expensive requiring training over multiple days.</p>
+
+<p><a href="https://arxiv.org/abs/1602.01783">Mnih et all. 2016</a> proposed an asynchronous variant of the traditional RL algorithms which were backed by deep neural networks. The current state of the art Asynchronous Advantage Actor-Critic (A3C) surpasses DQN while training for half the time on a single multi-core CPU.  The key ideas are,</p>
+
+<ul>
+  <li>
+    <p>Replace experience replay with multiple actors training in parallel. This way it is likely that different <em>threads</em> can explore different policies so the overall updates made to the global parameters are less correlated. This can stabilize learning more effectively than a single actor making updates.</p>
+  </li>
+  <li>
+    <p>It was empirically observed that reduction in training time is roughly linear with respect to number of parallel actors. Eliminating experience replay means we can now use on-policy methods like SARSA and Actor-Critic.</p>
+  </li>
+  <li>
+    <p>Once each actor completes a rollout of their policy, they can perform updates to the global parameters <strong>asynchronously</strong>. This enables us to use Hogwild! updates as introduced in <a href="https://arxiv.org/abs/1106.5730">Recht et al. 2011</a> where they showed that when most gradient updates only change small parts of a decision variable, then SGD can be parallelized without any locking.</p>
+  </li>
+</ul>
+
+<p>Following figure illustrates the architecture used in implementing Actor-Critic in practice. The following architecture is <em>replicated</em> on each of the actor-threads. Each actor-thread has a <em>local</em> copy of the parameters, which they use to explore the policy and calculate the loss function for the corresponding trajectory. After that, the gradients of this loss function are taken with respect to the <em>global</em> parameters, which are then aggregated over to update them.</p>
+
+<center>
+<img src="/images/rl-2/a3c_arch.png" width="75%" height="75%" />
+</center>
+
+<p>The Actor Network and Value Network share most of the parameters. The loss function is combined from the actor and value network. An entropy of the policy $\pi$ is also added to prevent premature convergence to suboptimal policies. This is to give the network an escape route when it is stuck in policies which are bad but are also near-deterministic. For example, let’s say we have an agent with three actions $\langle \text{right, left, stay}\rangle$. If it is stuck in a bad state but the policy prematurely converged to values $\langle0,0.01,0.99\rangle$, it is going to be stuck forever. A nudge to increase its entropy can get the agent out of this.</p>
+
+<p>From Actor-Critic equation described in the last section, we can derive the policy loss as follows,</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+\text{Policy Loss} = -\left[\mathbb{E}_\tau\left[\sum_{t=0}^{T-1} \log \pi(a_{t} | s_{t}; \theta) (R_t - V(s_t;\theta_v))\right] + \beta*H(\pi(s_t;\theta))\right]
+\end{equation}</script>
+
+<p>where $R_t = \sum_{t’=t}^{T-1} \gamma^{t’}r_{t’}$ and the entropy $H(\pi(s;\theta))$ is defined as,</p>
+
+<script type="math/tex; mode=display">H(\pi(s;\theta)) = -\sum_{a}\pi(a|s;\theta) \log \pi(a|s;\theta)</script>
+
+<p>The value loss is defined as,</p>
+
+<script type="math/tex; mode=display">\begin{equation}\label{eq:value_l}
+\text{Value Loss} = \mathbb{E}_\tau\left[ \sum_{t=0}^{T-1}(R_t - V(s_t; \theta_v))^2\right]
+\end{equation}</script>
+
+<p>Combining both, we define the total loss function as,</p>
+
+<script type="math/tex; mode=display">\text{Loss} = \text{Policy Loss} + \text{Value Loss}</script>
+
+<p>With this we can set up our neural network model in TensorFlow similar to the way it was done for policy gradients.</p>
+
+  </div>
+
+  <!-- mathjax -->
+  
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+  });
+  </script>
+  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+  
+</article>
+
+      </div>
+
+      <div class="push"></div>
+  </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/thegyro"><i class="svg-icon github"></i></a>
+
+
+
+
+
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    <!-- 
+ -->
+  </body>
+</html>
